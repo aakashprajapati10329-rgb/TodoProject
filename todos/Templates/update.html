@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <title>TaskMaster - Update Task</title>
+</head>
+<body>
+    <header>
+        <h1 class="title">Update Task</h1>
+        <span class="title-badge">Task Editor</span>
+    </header>
+
+    <main class="update-section">
+        <a href="{% url 'home' %}" class="btn back-btn">← Back to Tasks</a>
+        <h2>Edit Task Details</h2>
+        <form action="" method="post" class="update-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn update-btn">💾 Save Changes</button>
+        </form>
+    </main>
+</body>
+</html>

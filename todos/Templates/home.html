@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <title>TaskMaster - Modern Todo List</title>
+</head>
+<body>
+    <header>
+        <h1 class="title">TaskMaster</h1>
+        <span class="title-badge">Productivity Hub</span>
+    </header>
+
+    <section class="add-section">
+        <h2>Add a New Task</h2>
+        <form action="" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn add-btn">＋ Add Task</button>
+        </form>
+    </section>
+
+    <main class="task-container">
+        {% for task in tasks %}
+        <div class="task-card">
+            <h2 class="task-title">{{ task.title }}</h2>
+            <div class="task-buttons">
+                <a href="{% url 'update' task.id %}" class="btn edit-btn">✎ Edit</a>
+                <a href="{% url 'delete' task.id %}" class="btn delete-btn">🗑 Delete</a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="no-tasks">
+            <span>No tasks yet. Add a new task above to get started!</span>
+        </div>
+        {% endfor %}
+    </main>
+</body>
+</html>

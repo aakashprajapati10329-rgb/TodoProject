@@ -1,0 +1,399 @@
+/* ============================================
+   CLYDERSPARKS TODO APP - GLASSY FUTURISTIC STYLE
+   ============================================ */
+
+/* RESET + BASE STYLES */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+    text-decoration: none;
+}
+
+body {
+    min-height: 100vh;
+    background: radial-gradient(circle at 10% 20%, #0f172a, #1e293b 80%);
+    color: #f1f5f9;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Subtle animated gradient overlay */
+body::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, rgba(56,189,248,0.1), rgba(56,189,248,0.05), rgba(14,165,233,0.1));
+    animation: moveBg 12s infinite alternate ease-in-out;
+    z-index: 0;
+    pointer-events: none;
+}
+
+@keyframes moveBg {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(-10%, -10%) scale(1.2); }
+}
+
+/* HEADER */
+.header {
+    text-align: center;
+    margin-bottom: 2rem;
+    z-index: 1;
+}
+
+.title {
+    font-size: 2.2rem;
+    color: #38bdf8;
+    text-shadow: 0 0 10px rgba(56, 189, 248, 0.8);
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+/* ADD TASK FORM */
+.add-section {
+    position: relative;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(15px);
+    border-radius: 1rem;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4);
+    width: 100%;
+    max-width: 500px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    z-index: 1;
+}
+
+.add-section::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(56,189,248,0.8), rgba(37,99,235,0.6));
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask-composite: destination-out;
+    pointer-events: none;
+}
+
+.add-section form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.add-section input[type="text"],
+.add-section textarea {
+    width: 100%;
+    padding: 0.8rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    font-size: 1rem;
+    outline: none;
+    transition: 0.2s;
+}
+
+.add-section input:focus,
+.add-section textarea:focus {
+    border-color: #38bdf8;
+    box-shadow: 0 0 10px rgba(56,189,248,0.4);
+}
+
+.add-section label {
+    color: #cbd5e1;
+    font-weight: 500;
+}
+
+/* BUTTONS */
+.btn {
+    padding: 0.7rem 1.4rem;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    background: transparent;
+}
+
+.btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, #38bdf8, #0ea5e9, #3b82f6);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+    border-radius: inherit;
+}
+
+.btn:hover::before {
+    opacity: 1;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    color: #0f172a;
+}
+
+.add-btn {
+    color: #38bdf8;
+    border: 1px solid #38bdf8;
+}
+.edit-btn {
+    color: #22c55e;
+    border: 1px solid #22c55e;
+}
+.delete-btn {
+    color: #ef4444;
+    border: 1px solid #ef4444;
+}
+
+/* TASK LIST */
+.task-container {
+    display: grid;
+    gap: 1rem;
+    width: 100%;
+    max-width: 600px;
+    z-index: 1;
+}
+
+.task-card {
+    position: relative;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    backdrop-filter: blur(15px);
+    border-radius: 1rem;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 4px 25px rgba(0,0,0,0.4);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+    animation: floatCard 6s ease-in-out infinite alternate;
+}
+
+.task-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(56,189,248,0.8), rgba(37,99,235,0.6));
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask-composite: destination-out;
+    pointer-events: none;
+}
+
+.task-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 30px rgba(0,0,0,0.5);
+}
+
+.task-title {
+    font-size: 1.2rem;
+    color: #e2e8f0;
+}
+
+.task-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* FLOAT ANIMATION */
+@keyframes floatCard {
+    0% { transform: translateY(0px); }
+    100% { transform: translateY(-4px); }
+}
+
+/* EMPTY STATE */
+.no-task {
+    color: #94a3b8;
+    text-align: center;
+    font-weight: 400;
+    margin-top: 2rem;
+}
+
+/* SCROLLBAR + RESPONSIVE */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-thumb {
+    background: #38bdf8;
+    border-radius: 10px;
+}
+
+@media (max-width: 600px) {
+    .task-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.8rem;
+    }
+}
+
+
+/* ============================================
+   UPDATE PAGE STYLING
+   ============================================ */
+.update-section {
+    position: relative;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(15px);
+    border-radius: 1rem;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4);
+    width: 100%;
+    max-width: 500px;
+    padding: 2rem;
+    margin-top: 2rem;
+    z-index: 1;
+}
+
+.update-section::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(56,189,248,0.8), rgba(37,99,235,0.6));
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask-composite: destination-out;
+    pointer-events: none;
+}
+
+.update-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    z-index: 1;
+}
+
+.update-form input[type="text"],
+.update-form textarea {
+    width: 100%;
+    padding: 0.8rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    font-size: 1rem;
+    outline: none;
+    transition: 0.2s;
+}
+
+.update-form input:focus,
+.update-form textarea:focus {
+    border-color: #38bdf8;
+    box-shadow: 0 0 10px rgba(56,189,248,0.4);
+}
+
+/* Buttons */
+.update-btn {
+    border: 1px solid #38bdf8;
+    color: #38bdf8;
+    background: transparent;
+}
+
+.update-btn:hover::before {
+    background: linear-gradient(90deg, #38bdf8, #0ea5e9, #3b82f6);
+}
+
+.back-btn {
+    border: 1px solid #94a3b8;
+    color: #94a3b8;
+    background: transparent;
+    margin-bottom: 1rem;
+}
+
+.back-btn:hover {
+    color: #0f172a;
+}
+
+.back-btn:hover::before {
+    background: linear-gradient(90deg, #64748b, #94a3b8);
+}
+
+
+/* ============================================
+   DELETE PAGE STYLING
+   ============================================ */
+.delete-section {
+    position: relative;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(15px);
+    border-radius: 1rem;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4);
+    width: 100%;
+    max-width: 500px;
+    padding: 2rem;
+    margin-top: 2rem;
+    text-align: center;
+    z-index: 1;
+}
+
+.delete-section::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(239,68,68,0.8), rgba(220,38,38,0.6));
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask-composite: destination-out;
+    pointer-events: none;
+}
+
+.delete-message {
+    color: #f1f5f9;
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.delete-task {
+    color: #ef4444;
+    font-weight: 600;
+    text-shadow: 0 0 10px rgba(239,68,68,0.6);
+}
+
+.delete-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.confirm-delete {
+    border: 1px solid #ef4444;
+    color: #ef4444;
+    background: transparent;
+}
+
+.confirm-delete:hover::before {
+    background: linear-gradient(90deg, #ef4444, #dc2626);
+}
+
+.cancel-delete {
+    border: 1px solid #94a3b8;
+    color: #94a3b8;
+    background: transparent;
+}
+
+.cancel-delete:hover::before {
+    background: linear-gradient(90deg, #64748b, #94a3b8);
+}
