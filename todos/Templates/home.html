@@ -1,335 +1,769 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
     <link rel="stylesheet" href="{% static 'styles.css' %}">
-    <title>TaskMaster - Smart Productivity Hub</title>
+
+    <title>TaskMaster - Dashboard</title>
 </head>
+
 <body>
-    <!-- Top Navigation Bar -->
-    <header class="app-header">
-        <div class="brand-group">
-            <h1 class="title">TaskMaster</h1>
-            <span class="title-badge">Smart Todo System</span>
-        </div>
-        
-        <div class="user-nav">
-            <div class="user-profile">
-                <span class="user-avatar">👤</span>
-                <span class="user-name">{{ user.username }}</span>
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+            <div class="brand-icon">✓</div>
+
+            <div>
+                <h1>TaskMaster</h1>
+                <span>Smart Todo System</span>
             </div>
-            <a href="{% url 'logout' %}" class="btn logout-btn" title="Sign Out">🚪 Logout</a>
         </div>
-    </header>
 
-    <!-- Flash Messages -->
-    {% if messages %}
-    <div class="messages-container">
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">
-            {{ message }}
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
 
-    <!-- Productivity Overview Stats -->
-    <section class="stats-container">
-        <div class="stat-card">
-            <span class="stat-number">{{ stats.total }}</span>
-            <span class="stat-label">Total Tasks</span>
-        </div>
-        <div class="stat-card stat-pending">
-            <span class="stat-number">{{ stats.pending }}</span>
-            <span class="stat-label">Pending</span>
-        </div>
-        <div class="stat-card stat-completed">
-            <span class="stat-number">{{ stats.completed }}</span>
-            <span class="stat-label">Completed</span>
-        </div>
-        <div class="stat-card stat-high-priority">
-            <span class="stat-number">{{ stats.high_priority }}</span>
-            <span class="stat-label">High Priority</span>
-        </div>
-    </section>
+        <nav class="sidebar-nav">
 
-    <!-- Add Task Section -->
-    <section class="add-section">
-        <div class="section-title-wrap">
-            <h2>➕ Add a New Task</h2>
-        </div>
-        <form action="{% url 'home' %}" method="post" class="create-task-form">
-            {% csrf_token %}
-            
-            <div class="form-group">
-                <label for="{{ form.title.id_for_label }}">Task Title *</label>
-                {{ form.title }}
-                {% if form.title.errors %}
-                <span class="error-text">{{ form.title.errors.0 }}</span>
-                {% endif %}
-            </div>
+            <a href="{% url 'home' %}" class="nav-item active">
+                <span>▦</span>
+                Dashboard
+            </a>
 
-            <div class="form-row">
-                <div class="form-group flex-1">
-                    <label for="{{ form.category.id_for_label }}">Category</label>
-                    {{ form.category }}
+            <a href="?status=all" class="nav-item">
+                <span>📋</span>
+                All Tasks
+            </a>
+
+            <a href="?status=pending" class="nav-item">
+                <span>◷</span>
+                Pending
+            </a>
+
+            <a href="?status=completed" class="nav-item">
+                <span>✓</span>
+                Completed
+            </a>
+
+            <a href="?priority=HIGH" class="nav-item">
+                <span>🔥</span>
+                High Priority
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <button type="button"
+                    class="sidebar-add-btn"
+                    onclick="openTaskModal()">
+
+                <span>＋</span>
+                Add New Task
+
+            </button>
+
+
+            <div class="sidebar-user">
+
+                <div class="sidebar-avatar">
+                    {{ user.username|first|upper }}
                 </div>
-                <div class="form-group flex-1">
-                    <label for="{{ form.priority.id_for_label }}">Priority</label>
-                    {{ form.priority }}
+
+                <div class="sidebar-user-info">
+                    <strong>{{ user.username }}</strong>
+                    <span>Logged in</span>
                 </div>
-                <div class="form-group flex-1">
-                    <label for="{{ form.due_date.id_for_label }}">Due Date</label>
-                    {{ form.due_date }}
-                </div>
-            </div>
 
-            <div class="form-group">
-                <label for="{{ form.description.id_for_label }}">Description / Notes (Optional)</label>
-                {{ form.description }}
-            </div>
-
-            <button type="submit" class="btn add-btn">＋ Create Task</button>
-        </form>
-    </section>
-
-    <!-- Filters & Search & Sort Toolbar -->
-    <section class="filter-toolbar">
-        <!-- Search and Sort Row -->
-        <form method="get" action="{% url 'home' %}" class="search-sort-form">
-            <div class="search-box">
-                <input type="text" name="q" value="{{ search_query }}" placeholder="Search by title, notes, or category..." class="search-input" autocomplete="off">
-                {% if status_filter != 'all' %}
-                <input type="hidden" name="status" value="{{ status_filter }}">
-                {% endif %}
-                {% if priority_filter != 'all' %}
-                <input type="hidden" name="priority" value="{{ priority_filter }}">
-                {% endif %}
-                {% if category_filter != 'all' %}
-                <input type="hidden" name="category" value="{{ category_filter }}">
-                {% endif %}
-                <input type="hidden" name="sort" value="{{ sort_by }}">
-                <button type="submit" class="btn search-btn">🔍</button>
-                {% if search_query %}
-                <a href="{% url 'home' %}?status={{ status_filter }}&priority={{ priority_filter }}&category={{ category_filter }}&sort={{ sort_by }}" class="clear-search-btn" title="Clear search">✕</a>
-                {% endif %}
-            </div>
-
-            <div class="sort-box">
-                <label for="sortSelect" class="sort-label">Sort by:</label>
-                <select id="sortSelect" name="sort" class="sort-select" onchange="this.form.submit()">
-                    <option value="created_desc" {% if sort_by == 'created_desc' %}selected{% endif %}>🕒 Newest First</option>
-                    <option value="created_asc" {% if sort_by == 'created_asc' %}selected{% endif %}>⏳ Oldest First</option>
-                    <option value="due_date" {% if sort_by == 'due_date' %}selected{% endif %}>📅 Due Date (Earliest)</option>
-                    <option value="priority" {% if sort_by == 'priority' %}selected{% endif %}>🔥 Priority (High to Low)</option>
-                    <option value="title" {% if sort_by == 'title' %}selected{% endif %}>🔤 Alphabetical (A-Z)</option>
-                </select>
-            </div>
-        </form>
-
-        <!-- Category Filter Row -->
-        <div class="filter-group">
-            <span class="filter-label">Category:</span>
-            <div class="filter-chips">
-                <a href="?status={{ status_filter }}&priority={{ priority_filter }}&category=all&sort={{ sort_by }}{% if search_query %}&q={{ search_query }}{% endif %}" 
-                   class="filter-chip {% if category_filter == 'all' %}active{% endif %}">All</a>
-                {% for cat_code, cat_label in category_choices %}
-                <a href="?status={{ status_filter }}&priority={{ priority_filter }}&category={{ cat_code }}&sort={{ sort_by }}{% if search_query %}&q={{ search_query }}{% endif %}" 
-                   class="filter-chip chip-category-{{ cat_code|lower }} {% if category_filter == cat_code %}active{% endif %}">
-                   {{ cat_label }}
+                <a href="{% url 'logout' %}" class="sidebar-logout">
+                    ⇥
                 </a>
-                {% endfor %}
+
             </div>
+
         </div>
 
-        <!-- Priority & Status Filter Row -->
-        <div class="filter-sub-row">
-            <div class="filter-group">
-                <span class="filter-label">Priority:</span>
-                <div class="filter-chips">
-                    <a href="?status={{ status_filter }}&priority=all&category={{ category_filter }}&sort={{ sort_by }}{% if search_query %}&q={{ search_query }}{% endif %}" 
-                       class="filter-chip {% if priority_filter == 'all' %}active{% endif %}">All</a>
-                    <a href="?status={{ status_filter }}&priority=HIGH&category={{ category_filter }}&sort={{ sort_by }}{% if search_query %}&q={{ search_query }}{% endif %}" 
-                       class="filter-chip chip-high {% if priority_filter == 'HIGH' %}active{% endif %}">🔥 High</a>
-                    <a href="?status={{ status_filter }}&priority=MEDIUM&category={{ category_filter }}&sort={{ sort_by }}{% if search_query %}&q={{ search_query }}{% endif %}" 
-                       class="filter-chip chip-medium {% if priority_filter == 'MEDIUM' %}active{% endif %}">⚡ Medium</a>
-                    <a href="?status={{ status_filter }}&priority=LOW&category={{ category_filter }}&sort={{ sort_by }}{% if search_query %}&q={{ search_query }}{% endif %}" 
-                       class="filter-chip chip-low {% if priority_filter == 'LOW' %}active{% endif %}">🌱 Low</a>
-                </div>
-            </div>
+    </aside>
 
-            <div class="filter-group">
-                <span class="filter-label">Status:</span>
-                <div class="filter-chips">
-                    <a href="?status=all&priority={{ priority_filter }}&category={{ category_filter }}&sort={{ sort_by }}{% if search_query %}&q={{ search_query }}{% endif %}" 
-                       class="filter-chip {% if status_filter == 'all' %}active{% endif %}">All</a>
-                    <a href="?status=pending&priority={{ priority_filter }}&category={{ category_filter }}&sort={{ sort_by }}{% if search_query %}&q={{ search_query }}{% endif %}" 
-                       class="filter-chip {% if status_filter == 'pending' %}active{% endif %}">Pending</a>
-                    <a href="?status=completed&priority={{ priority_filter }}&category={{ category_filter }}&sort={{ sort_by }}{% if search_query %}&q={{ search_query }}{% endif %}" 
-                       class="filter-chip {% if status_filter == 'completed' %}active{% endif %}">Completed</a>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- Tasks List Container -->
-    <main class="task-container">
-        {% for task in tasks %}
-        <div class="task-card {% if task.is_completed %}task-completed{% endif %} priority-border-{{ task.priority|lower }}">
-            <div class="task-main">
-                <div class="task-header-row">
-                    <!-- Toggle Checkbox Button -->
-                    <a href="{% url 'toggle_complete' task.id %}" class="toggle-check-btn {% if task.is_completed %}checked{% endif %}" title="Toggle Completion">
-                        {% if task.is_completed %}✔{% endif %}
-                    </a>
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
 
-                    <div class="task-info">
-                        <h3 class="task-title {% if task.is_completed %}completed-text{% endif %}">
-                            {{ task.title }}
-                        </h3>
+    <main class="main-content">
 
-                        <div class="task-badges">
-                            <!-- Category Badge -->
-                            <span class="badge category-badge cat-{{ task.category|lower }}">
-                                {{ task.get_category_display }}
-                            </span>
 
-                            <!-- Priority Badge -->
-                            <span class="badge priority-badge badge-{{ task.priority|lower }}">
-                                {% if task.priority == 'HIGH' %}🔥 High Priority
-                                {% elif task.priority == 'MEDIUM' %}⚡ Medium Priority
-                                {% else %}🌱 Low Priority{% endif %}
-                            </span>
+        <!-- HEADER -->
 
-                            <!-- Due Date Badge -->
-                            {% if task.due_date %}
-                            <span class="badge date-badge">
-                                📅 Due: {{ task.due_date|date:"M d, Y" }}
-                            </span>
-                            {% endif %}
+        <header class="top-header">
 
-                            <!-- Status Badge -->
-                            {% if task.is_completed %}
-                            <span class="badge completed-badge">✓ Done</span>
-                            {% endif %}
-                        </div>
+            <div>
+                <span class="welcome-text">Welcome back 👋</span>
 
-                        {% if task.description %}
-                        <p class="task-description">{{ task.description }}</p>
-                        {% endif %}
+                <h2>My Tasks</h2>
 
-                        <span class="task-meta">Created {{ task.created_at|date:"M d, Y" }}</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="task-buttons">
-                <a href="{% url 'update' task.id %}" class="btn edit-btn" title="Edit Task">✎ Edit</a>
-                <a href="{% url 'delete' task.id %}" class="btn delete-btn" title="Delete Task">🗑 Delete</a>
-            </div>
-        </div>
-        {% empty %}
-        <div class="no-task">
-            <div class="empty-icon">📝</div>
-            <h3>No tasks found</h3>
-            <p>
-                {% if search_query or status_filter != 'all' or priority_filter != 'all' or category_filter != 'all' %}
-                No tasks match your current filters. <a href="{% url 'home' %}" class="reset-filter-link">Clear all filters</a>
-                {% else %}
-                You have no tasks yet! Add one above to organize your tasks by category and priority.
-                {% endif %}
-            </p>
-        </div>
-        {% endfor %}
-    </main>
-
-    <!-- Urgent Due Tasks Pop-up Modal (Triggers on Login) -->
-    {% if show_due_modal and due_soon_tasks %}
-    <div class="due-modal-overlay" id="dueModalOverlay">
-        <div class="due-modal-card" role="dialog" aria-modal="true" aria-labelledby="dueModalTitle">
-            <button class="modal-close-icon" id="closeModalIcon" title="Close modal">✕</button>
-            
-            <div class="due-modal-header">
-                <div class="due-modal-icon-pulse">⏰</div>
-                <h2 id="dueModalTitle">Urgent Task Alert</h2>
-                <p class="due-modal-subtitle">
-                    You have <strong class="highlight-count">{{ due_soon_tasks|length }}</strong> task{{ due_soon_tasks|length|pluralize }} due in less than 24 hours or needing urgent attention:
+                <p>
+                    Stay organized and get things done.
                 </p>
             </div>
 
-            <div class="due-modal-list">
-                {% for task in due_soon_tasks %}
-                <div class="due-modal-item priority-border-{{ task.priority|lower }}">
-                    <div class="due-item-main">
-                        <div class="due-item-badges">
-                            {% if task.due_date < today %}
-                            <span class="due-status-pill status-overdue">⚠️ Overdue ({{ task.due_date|date:"M d" }})</span>
-                            {% elif task.due_date == today %}
-                            <span class="due-status-pill status-today">🔥 Due Today</span>
-                            {% else %}
-                            <span class="due-status-pill status-tomorrow">⏳ Due in &lt; 24h ({{ task.due_date|date:"M d" }})</span>
+
+            <button class="top-add-btn"
+                    onclick="openTaskModal()">
+
+                <span>＋</span>
+                Add Task
+
+            </button>
+
+        </header>
+
+
+
+        <!-- =================================================
+             STATISTICS
+        ================================================== -->
+
+        <section class="stats-container">
+
+            <div class="stat-card">
+
+                <div class="stat-icon purple">
+                    📋
+                </div>
+
+                <div>
+                    <span class="stat-number">
+                        {{ stats.total }}
+                    </span>
+
+                    <span class="stat-label">
+                        Total Tasks
+                    </span>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon yellow">
+                    ◷
+                </div>
+
+                <div>
+                    <span class="stat-number">
+                        {{ stats.pending }}
+                    </span>
+
+                    <span class="stat-label">
+                        Pending
+                    </span>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon green">
+                    ✓
+                </div>
+
+                <div>
+                    <span class="stat-number">
+                        {{ stats.completed }}
+                    </span>
+
+                    <span class="stat-label">
+                        Completed
+                    </span>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon red">
+                    🔥
+                </div>
+
+                <div>
+                    <span class="stat-number">
+                        {{ stats.high_priority }}
+                    </span>
+
+                    <span class="stat-label">
+                        High Priority
+                    </span>
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             SEARCH + FILTER
+        ================================================== -->
+
+        <section class="task-toolbar">
+
+            <form method="get"
+                  action="{% url 'home' %}"
+                  class="search-form">
+
+                <div class="search-wrapper">
+
+                    <span class="search-icon">
+                        🔍
+                    </span>
+
+                    <input
+                        type="text"
+                        name="q"
+                        value="{{ search_query }}"
+                        placeholder="Search your tasks..."
+                        class="search-input"
+                        autocomplete="off"
+                    >
+
+                    {% if search_query %}
+                    <a href="{% url 'home' %}"
+                       class="search-clear">
+                        ×
+                    </a>
+                    {% endif %}
+
+                </div>
+
+
+                <select name="sort"
+                        class="sort-select"
+                        onchange="this.form.submit()">
+
+                    <option value="created_desc"
+                        {% if sort_by == 'created_desc' %}selected{% endif %}>
+                        Newest
+                    </option>
+
+                    <option value="created_asc"
+                        {% if sort_by == 'created_asc' %}selected{% endif %}>
+                        Oldest
+                    </option>
+
+                    <option value="due_date"
+                        {% if sort_by == 'due_date' %}selected{% endif %}>
+                        Due Date
+                    </option>
+
+                    <option value="priority"
+                        {% if sort_by == 'priority' %}selected{% endif %}>
+                        Priority
+                    </option>
+
+                    <option value="title"
+                        {% if sort_by == 'title' %}selected{% endif %}>
+                        A-Z
+                    </option>
+
+                </select>
+
+
+                <button type="submit"
+                        class="search-submit">
+                    Search
+                </button>
+
+            </form>
+
+
+
+            <!-- FILTER CHIPS -->
+
+            <div class="filter-row">
+
+                <span class="filter-title">
+                    Filter:
+                </span>
+
+
+                <a href="{% url 'home' %}"
+                   class="filter-chip {% if status_filter == 'all' %}active{% endif %}">
+                    All
+                </a>
+
+
+                <a href="?status=pending"
+                   class="filter-chip {% if status_filter == 'pending' %}active{% endif %}">
+                    Pending
+                </a>
+
+
+                <a href="?status=completed"
+                   class="filter-chip {% if status_filter == 'completed' %}active{% endif %}">
+                    Completed
+                </a>
+
+
+                <a href="?priority=HIGH"
+                   class="filter-chip high {% if priority_filter == 'HIGH' %}active{% endif %}">
+                    🔥 High Priority
+                </a>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             TASK AREA
+        ================================================== -->
+
+        <section class="tasks-section">
+
+
+            <div class="tasks-header">
+
+                <div>
+                    <h3>All Tasks</h3>
+
+                    <span>
+                        {{ stats.total }} tasks in your workspace
+                    </span>
+                </div>
+
+
+                <button class="small-add-btn"
+                        onclick="openTaskModal()">
+
+                    ＋ New Task
+
+                </button>
+
+            </div>
+
+
+
+            <!-- TASK LIST -->
+
+            <div class="task-list">
+
+                {% for task in tasks %}
+
+                <article class="task-card
+                    {% if task.is_completed %}completed{% endif %}
+                    priority-{{ task.priority|lower }}">
+
+
+                    <!-- CHECKBOX -->
+
+                    <a href="{% url 'toggle_complete' task.id %}"
+                       class="task-checkbox
+                       {% if task.is_completed %}checked{% endif %}">
+
+                        {% if task.is_completed %}
+                            ✓
+                        {% endif %}
+
+                    </a>
+
+
+
+                    <!-- TASK INFORMATION -->
+
+                    <div class="task-content">
+
+                        <div class="task-title-row">
+
+                            <h4>
+                                {{ task.title }}
+                            </h4>
+
+                            {% if task.is_completed %}
+
+                            <span class="done-badge">
+                                Completed
+                            </span>
+
                             {% endif %}
 
-                            <span class="badge category-badge cat-{{ task.category|lower }}">
+                        </div>
+
+
+
+                        {% if task.description %}
+
+                        <p class="task-description">
+                            {{ task.description }}
+                        </p>
+
+                        {% endif %}
+
+
+
+                        <div class="task-meta">
+
+
+                            <!-- CATEGORY -->
+
+                            <span class="category-badge">
                                 {{ task.get_category_display }}
                             </span>
 
-                            <span class="badge priority-badge badge-{{ task.priority|lower }}">
-                                {{ task.get_priority_display }}
+
+                            <!-- PRIORITY -->
+
+                            {% if task.priority == 'HIGH' %}
+
+                            <span class="priority-badge high">
+                                🔥 High
                             </span>
+
+                            {% elif task.priority == 'MEDIUM' %}
+
+                            <span class="priority-badge medium">
+                                ⚡ Medium
+                            </span>
+
+                            {% else %}
+
+                            <span class="priority-badge low">
+                                🌱 Low
+                            </span>
+
+                            {% endif %}
+
+
+                            <!-- DATE -->
+
+                            {% if task.due_date %}
+
+                            <span class="date-badge">
+                                📅 {{ task.due_date|date:"M d, Y" }}
+                            </span>
+
+                            {% endif %}
+
                         </div>
 
-                        <h4 class="due-item-title">{{ task.title }}</h4>
-                        {% if task.description %}
-                        <p class="due-item-desc">{{ task.description|truncatewords:12 }}</p>
+                    </div>
+
+
+
+                    <!-- ACTIONS -->
+
+                    <div class="task-actions">
+
+                        <a href="{% url 'update' task.id %}"
+                           class="action-btn edit">
+                            ✎
+                        </a>
+
+
+                        <a href="{% url 'delete' task.id %}"
+                           class="action-btn delete">
+                            🗑
+                        </a>
+
+                    </div>
+
+                </article>
+
+
+                {% empty %}
+
+
+                <!-- EMPTY STATE -->
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        📝
+                    </div>
+
+                    <h3>
+                        No tasks found
+                    </h3>
+
+                    <p>
+                        {% if search_query %}
+                            No tasks match your search.
+                        {% else %}
+                            Start organizing your day by creating your first task.
                         {% endif %}
-                    </div>
+                    </p>
 
-                    <div class="due-item-actions">
-                        <a href="{% url 'toggle_complete' task.id %}" class="btn due-complete-btn" title="Mark as Done">✔ Complete</a>
-                        <a href="{% url 'update' task.id %}" class="btn due-edit-btn" title="View / Edit Task">✎ Edit</a>
-                    </div>
+                    <button onclick="openTaskModal()"
+                            class="empty-add-btn">
+
+                        ＋ Create Your First Task
+
+                    </button>
+
                 </div>
+
                 {% endfor %}
+
             </div>
 
-            <div class="due-modal-footer">
-                <button type="button" class="btn due-dismiss-btn" id="dismissModalBtn">Got it, Let's Focus! 🚀</button>
+        </section>
+
+    </main>
+
+
+
+    <!-- =====================================================
+         ADD TASK MODAL
+    ====================================================== -->
+
+    <div class="modal-overlay"
+         id="taskModal"
+         onclick="closeTaskModalOutside(event)">
+
+        <div class="task-modal">
+
+
+            <!-- MODAL HEADER -->
+
+            <div class="modal-header">
+
+                <div>
+
+                    <span class="modal-small-title">
+                        TASK MANAGEMENT
+                    </span>
+
+                    <h2>
+                        Create New Task
+                    </h2>
+
+                    <p>
+                        Add a task and stay organized.
+                    </p>
+
+                </div>
+
+
+                <button class="modal-close"
+                        onclick="closeTaskModal()">
+
+                    ×
+
+                </button>
+
             </div>
+
+
+
+            <!-- FORM -->
+
+            <form action="{% url 'home' %}"
+                  method="post"
+                  class="modal-form">
+
+                {% csrf_token %}
+
+
+                <!-- TITLE -->
+
+                <div class="form-group">
+
+                    <label for="{{ form.title.id_for_label }}">
+                        Task Title *
+                    </label>
+
+                    {{ form.title }}
+
+                    {% if form.title.errors %}
+
+                    <span class="error-text">
+                        {{ form.title.errors.0 }}
+                    </span>
+
+                    {% endif %}
+
+                </div>
+
+
+
+                <!-- CATEGORY + PRIORITY -->
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label for="{{ form.category.id_for_label }}">
+                            Category
+                        </label>
+
+                        {{ form.category }}
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="{{ form.priority.id_for_label }}">
+                            Priority
+                        </label>
+
+                        {{ form.priority }}
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- DUE DATE -->
+
+                <div class="form-group">
+
+                    <label for="{{ form.due_date.id_for_label }}">
+                        Due Date
+                    </label>
+
+                    {{ form.due_date }}
+
+                </div>
+
+
+
+                <!-- DESCRIPTION -->
+
+                <div class="form-group">
+
+                    <label for="{{ form.description.id_for_label }}">
+                        Description / Notes
+                    </label>
+
+                    {{ form.description }}
+
+                </div>
+
+
+
+                <!-- BUTTONS -->
+
+                <div class="modal-actions">
+
+                    <button type="button"
+                            class="cancel-btn"
+                            onclick="closeTaskModal()">
+
+                        Cancel
+
+                    </button>
+
+
+                    <button type="submit"
+                            class="create-btn">
+
+                        ✓ Create Task
+
+                    </button>
+
+                </div>
+
+            </form>
+
         </div>
+
     </div>
 
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const modal = document.getElementById('dueModalOverlay');
-            const closeIcon = document.getElementById('closeModalIcon');
-            const dismissBtn = document.getElementById('dismissModalBtn');
 
-            function closeModal() {
-                if (modal) {
-                    modal.classList.add('fade-out');
-                    setTimeout(() => modal.remove(), 250);
+        const taskModal =
+            document.getElementById("taskModal");
+
+
+        function openTaskModal() {
+
+            taskModal.classList.add("show");
+
+            document.body.classList.add("modal-open");
+
+            setTimeout(() => {
+
+                const firstInput =
+                    taskModal.querySelector("input");
+
+                if (firstInput) {
+                    firstInput.focus();
                 }
+
+            }, 150);
+
+        }
+
+
+        function closeTaskModal() {
+
+            taskModal.classList.remove("show");
+
+            document.body.classList.remove("modal-open");
+
+        }
+
+
+        function closeTaskModalOutside(event) {
+
+            if (event.target === taskModal) {
+
+                closeTaskModal();
+
             }
 
-            if (closeIcon) closeIcon.addEventListener('click', closeModal);
-            if (dismissBtn) dismissBtn.addEventListener('click', closeModal);
+        }
 
-            if (modal) {
-                modal.addEventListener('click', function(e) {
-                    if (e.target === modal) closeModal();
-                });
-                document.addEventListener('keydown', function(e) {
-                    if (e.key === 'Escape') closeModal();
-                });
+
+        document.addEventListener("keydown", function(event) {
+
+            if (event.key === "Escape") {
+
+                closeTaskModal();
+
             }
+
         });
+
+
+        /*
+         * Open modal automatically if Django
+         * returns form errors.
+         */
+
+        {% if form.errors %}
+
+            openTaskModal();
+
+        {% endif %}
+
     </script>
-    {% endif %}
+
+
 </body>
 </html>
