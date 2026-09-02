@@ -1,93 +1,152 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
     <link rel="stylesheet" href="{% static 'styles.css' %}">
+
     <title>TaskMaster - Edit Task</title>
 </head>
-<body>
-    <header class="app-header">
-        <div class="brand-group">
-            <h1 class="title">TaskMaster</h1>
-            <span class="title-badge">Task Editor</span>
-        </div>
-        
-        <div class="user-nav">
-            <div class="user-profile">
-                <span class="user-avatar">👤</span>
-                <span class="user-name">{{ user.username }}</span>
+
+<body class="auth-body">
+
+    <!-- Ambient background glow elements -->
+    <div class="auth-bg-glow glow-1"></div>
+    <div class="auth-bg-glow glow-2"></div>
+
+    <div class="auth-container edit-page-container">
+
+        <!-- Top Header Navigation -->
+        <header class="page-top-nav">
+            <div class="auth-brand">
+                <div class="brand-icon">✓</div>
+                <div class="brand-info">
+                    <h1>TaskMaster</h1>
+                    <span class="brand-badge">Task Editor</span>
+                </div>
             </div>
-            <a href="{% url 'logout' %}" class="btn logout-btn">🚪 Logout</a>
-        </div>
-    </header>
 
-    {% if messages %}
-    <div class="messages-container">
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">
-            {{ message }}
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-
-    <main class="update-section">
-        <a href="{% url 'home' %}" class="btn back-btn">← Back to Tasks</a>
-        <h2>Edit Task Details</h2>
-
-        <form action="" method="post" class="update-form">
-            {% csrf_token %}
-
-            {% if form.non_field_errors %}
-            <div class="form-errors">
-                {% for error in form.non_field_errors %}
-                <p class="error-text">{{ error }}</p>
-                {% endfor %}
+            <div class="user-meta-pill">
+                <span class="user-avatar-small">{{ user.username|first|upper }}</span>
+                <span class="user-name-text">{{ user.username }}</span>
+                <a href="{% url 'logout' %}" class="logout-link" title="Logout">⇥</a>
             </div>
-            {% endif %}
+        </header>
 
-            <div class="form-group">
-                <label for="{{ form.title.id_for_label }}">Task Title *</label>
-                {{ form.title }}
-                {% if form.title.errors %}
-                <span class="error-text">{{ form.title.errors.0 }}</span>
+        {% if messages %}
+        <div class="messages-container">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                <span class="alert-icon">
+                    {% if message.tags == 'error' %}⚠️{% elif message.tags == 'success' %}✓{% else %}ℹ️{% endif %}
+                </span>
+                <span class="alert-text">{{ message }}</span>
+                <button type="button" class="alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Edit Card -->
+        <div class="auth-card edit-card">
+
+            <div class="edit-card-header">
+                <a href="{% url 'home' %}" class="btn-back">
+                    <span>←</span>
+                    <span>Back to Dashboard</span>
+                </a>
+                <h2>Edit Task Details</h2>
+                <p>Modify task information, priority level, deadlines, or status.</p>
+            </div>
+
+            <form action="" method="post" class="modal-form edit-form">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                <div class="form-errors">
+                    {% for error in form.non_field_errors %}
+                    <p class="error-text">⚠️ {{ error }}</p>
+                    {% endfor %}
+                </div>
                 {% endif %}
-            </div>
 
-            <div class="form-row">
-                <div class="form-group flex-1">
-                    <label for="{{ form.category.id_for_label }}">Category</label>
-                    {{ form.category }}
+                <!-- Title -->
+                <div class="form-group">
+                    <label for="{{ form.title.id_for_label }}">Task Title *</label>
+                    <div class="input-wrapper">
+                        {{ form.title }}
+                    </div>
+                    {% if form.title.errors %}
+                    <span class="error-text">⚠️ {{ form.title.errors.0 }}</span>
+                    {% endif %}
                 </div>
-                <div class="form-group flex-1">
-                    <label for="{{ form.priority.id_for_label }}">Priority</label>
-                    {{ form.priority }}
+
+                <!-- Category + Priority + Due Date Row -->
+                <div class="form-row form-row-3">
+                    <div class="form-group">
+                        <label for="{{ form.category.id_for_label }}">Category</label>
+                        {{ form.category }}
+                        {% if form.category.errors %}
+                        <span class="error-text">⚠️ {{ form.category.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.priority.id_for_label }}">Priority</label>
+                        {{ form.priority }}
+                        {% if form.priority.errors %}
+                        <span class="error-text">⚠️ {{ form.priority.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.due_date.id_for_label }}">Due Date</label>
+                        {{ form.due_date }}
+                        {% if form.due_date.errors %}
+                        <span class="error-text">⚠️ {{ form.due_date.errors.0 }}</span>
+                        {% endif %}
+                    </div>
                 </div>
-                <div class="form-group flex-1">
-                    <label for="{{ form.due_date.id_for_label }}">Due Date</label>
-                    {{ form.due_date }}
+
+                <!-- Description -->
+                <div class="form-group">
+                    <label for="{{ form.description.id_for_label }}">Description / Notes</label>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                    <span class="error-text">⚠️ {{ form.description.errors.0 }}</span>
+                    {% endif %}
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label for="{{ form.description.id_for_label }}">Description / Notes</label>
-                {{ form.description }}
-            </div>
+                <!-- Status Checkbox -->
+                <div class="checkbox-wrapper">
+                    <label class="custom-checkbox-label" for="{{ form.is_completed.id_for_label }}">
+                        {{ form.is_completed }}
+                        <span class="checkbox-text">Mark this task as Completed</span>
+                    </label>
+                </div>
 
-            <div class="form-group checkbox-group">
-                <label class="checkbox-label" for="{{ form.is_completed.id_for_label }}">
-                    {{ form.is_completed }}
-                    <span>Mark this task as Completed</span>
-                </label>
-            </div>
+                <!-- Actions -->
+                <div class="modal-actions edit-actions">
+                    <a href="{% url 'home' %}" class="cancel-btn">Cancel</a>
+                    <button type="submit" class="create-btn save-btn">
+                        <span>💾 Save Changes</span>
+                    </button>
+                </div>
 
-            <button type="submit" class="btn update-btn">💾 Save Changes</button>
-        </form>
-    </main>
+            </form>
+
+        </div>
+
+    </div>
+
 </body>
+
 </html>

@@ -1,60 +1,96 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
     <link rel="stylesheet" href="{% static 'styles.css' %}">
-    <title>TaskMaster - Delete Confirmation</title>
+
+    <title>TaskMaster - Delete Task</title>
 </head>
-<body>
-    <header class="app-header">
-        <div class="brand-group">
-            <h1 class="title">TaskMaster</h1>
-            <span class="title-badge">Danger Zone</span>
-        </div>
-        
-        <div class="user-nav">
-            <div class="user-profile">
-                <span class="user-avatar">👤</span>
-                <span class="user-name">{{ user.username }}</span>
-            </div>
-            <a href="{% url 'logout' %}" class="btn logout-btn">🚪 Logout</a>
-        </div>
-    </header>
 
-    <main class="delete-section">
-        <div class="delete-icon">⚠️</div>
-        <h2>Delete Task</h2>
-        <p class="delete-message">Are you sure you want to permanently remove this task?</p>
-        
-        <div class="delete-preview-card">
-            <h3 class="delete-task-title">"{{ task.title }}"</h3>
-            <div class="delete-task-meta">
-                <span class="badge category-badge cat-{{ task.category|lower }}">
-                    {{ task.get_category_display }}
-                </span>
-                <span class="badge priority-badge badge-{{ task.priority|lower }}">
-                    Priority: {{ task.get_priority_display }}
-                </span>
-                {% if task.due_date %}
-                <span class="badge date-badge">Due: {{ task.due_date|date:"M d, Y" }}</span>
+<body class="auth-body">
+
+    <!-- Ambient background glow elements -->
+    <div class="auth-bg-glow glow-1"></div>
+    <div class="auth-bg-glow glow-2"></div>
+
+    <div class="auth-container">
+
+        <!-- Top Header Navigation -->
+        <header class="page-top-nav">
+            <div class="auth-brand">
+                <div class="brand-icon">✓</div>
+                <div class="brand-info">
+                    <h1>TaskMaster</h1>
+                    <span class="brand-badge danger-badge">Danger Zone</span>
+                </div>
+            </div>
+
+            <div class="user-meta-pill">
+                <span class="user-avatar-small">{{ user.username|first|upper }}</span>
+                <span class="user-name-text">{{ user.username }}</span>
+                <a href="{% url 'logout' %}" class="logout-link" title="Logout">⇥</a>
+            </div>
+        </header>
+
+        <!-- Delete Card -->
+        <div class="auth-card delete-card">
+
+            <div class="delete-header">
+                <div class="delete-icon-pulse">🗑️</div>
+                <h2>Delete Task</h2>
+                <p>Are you sure you want to permanently delete this task?</p>
+            </div>
+
+            <div class="delete-task-preview">
+                <h3 class="delete-preview-title">"{{ task.title }}"</h3>
+
+                {% if task.description %}
+                <p class="delete-preview-desc">{{ task.description }}</p>
                 {% endif %}
+
+                <div class="delete-meta-tags">
+                    <span class="category-badge">
+                        {{ task.get_category_display }}
+                    </span>
+
+                    {% if task.priority == 'HIGH' %}
+                    <span class="priority-badge high">🔥 High Priority</span>
+                    {% elif task.priority == 'MEDIUM' %}
+                    <span class="priority-badge medium">⚡ Medium Priority</span>
+                    {% else %}
+                    <span class="priority-badge low">🌱 Low Priority</span>
+                    {% endif %}
+
+                    {% if task.due_date %}
+                    <span class="date-badge">📅 Due: {{ task.due_date|date:"M d, Y" }}</span>
+                    {% endif %}
+                </div>
             </div>
+
+            <div class="delete-warning-box">
+                <span>⚠️</span>
+                <p>This action cannot be undone. All data associated with this task will be permanently removed.</p>
+            </div>
+
+            <form action="" method="post" class="delete-form-actions">
+                {% csrf_token %}
+                <a href="{% url 'home' %}" class="cancel-btn">Nevermind, Keep It</a>
+                <button type="submit" class="btn-delete-confirm">Yes, Delete Task</button>
+            </form>
+
         </div>
 
-        <p class="delete-warning">This action cannot be undone.</p>
-        
-        <form action="" method="post" class="delete-form">
-            {% csrf_token %}
-            <div class="delete-buttons">
-                <a href="{% url 'home' %}" class="btn cancel-delete">Cancel</a>
-                <button type="submit" class="btn confirm-delete">Yes, Delete Task</button>
-            </div>
-        </form>
-    </main>
+    </div>
+
 </body>
+
 </html>
